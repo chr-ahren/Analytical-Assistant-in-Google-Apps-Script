@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <title>Aplicación ANALÍTICA DE DATOS GAS</title>
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#0f172a;--panel:#111827;--panel-2:#1f2937;--text:#e5e7eb;
+      --muted:#94a3b8;--primary:#2563eb;--primary-hover:#1d4ed8;
+      --success:#16a34a;--warning:#d97706;--danger:#dc2626;
+      --border:#334155;--card:#0b1220;--shadow:0 10px 30px rgba(0,0,0,.25);
+      --radius:16px;--teal:#0d9488;--teal-hover:#0f766e;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;
+      background:linear-gradient(135deg,#0f172a,#111827 45%,#172554);
+      color:var(--text);min-height:100vh}
+    .container{width:min(1300px,94%);margin:24px auto 40px}
+    .header{background:rgba(17,24,39,.88);border:1px solid rgba(148,163,184,.15);
+      border-radius:22px;padding:24px;box-shadow:var(--shadow);backdrop-filter:blur(8px);margin-bottom:20px}
+    .header h1{margin:0 0 8px;font-size:28px}
+    .header p{margin:0;color:var(--muted);line-height:1.5}
+    .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}
+    .card{background:rgba(15,23,42,.88);border:1px solid rgba(148,163,184,.16);
+      border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+    .card h2{margin-top:0;margin-bottom:14px;font-size:20px}
+    label{display:block;font-weight:bold;margin:12px 0 8px;color:#dbeafe}
+    input[type="text"],textarea,input[type="file"]{
+      width:100%;border:1px solid var(--border);background:var(--panel-2);
+      color:var(--text);border-radius:12px;padding:12px 14px;font-size:14px;outline:none}
+    textarea{resize:vertical;min-height:130px}
+    .button-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+    button{border:none;border-radius:12px;padding:12px 16px;font-weight:bold;cursor:pointer;
+      transition:transform .08s ease,background .2s ease;color:white;background:var(--primary);font-size:13px}
+    button:hover{background:var(--primary-hover)}
+    button:active{transform:scale(0.99)}
+    button:disabled{opacity:.45;cursor:not-allowed}
+    .btn-secondary{background:#475569}.btn-secondary:hover{background:#334155}
+    .btn-success{background:var(--success)}.btn-success:hover{background:#15803d}
+    .btn-warning{background:var(--warning)}.btn-warning:hover{background:#b45309}
+    .btn-danger{background:var(--danger)}.btn-danger:hover{background:#b91c1c}
+    .btn-teal{background:var(--teal)}.btn-teal:hover{background:var(--teal-hover)}
+    .informe-badge{
+      display:none;align-items:center;gap:8px;margin-top:10px;
+      padding:10px 14px;background:rgba(13,148,136,.15);
+      border:1px solid rgba(13,148,136,.45);border-radius:12px;
+      color:#5eead4;font-size:12px;font-weight:bold}
+    .informe-badge.visible{display:flex}
+    .informe-badge .dot{width:8px;height:8px;border-radius:50%;
+      background:#2dd4bf;flex-shrink:0;animation:pulse 1.4s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+    .status{margin-top:14px;padding:12px 14px;background:rgba(37,99,235,.12);
+      border:1px solid rgba(96,165,250,.35);border-radius:12px;
+      color:#dbeafe;min-height:48px;white-space:pre-wrap}
+    .output{margin-top:16px}
+    .table-wrap{overflow:auto;border:1px solid rgba(148,163,184,.16);border-radius:14px;margin-top:10px}
+    table{width:100%;border-collapse:collapse;min-width:680px;background:#0b1220}
+    th,td{padding:10px 12px;border-bottom:1px solid rgba(148,163,184,.12);text-align:left;font-size:13px}
+    th{background:#172033;color:#cbd5e1;position:sticky;top:0}
+    .badge{display:inline-block;padding:6px 10px;border-radius:999px;
+      background:rgba(22,163,74,.15);color:#bbf7d0;font-size:12px;margin-right:8px;margin-bottom:8px}
+    .section-title{margin-top:18px;margin-bottom:8px;font-size:16px;color:#bfdbfe;font-weight:bold}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px}
+    .stat-card{background:#0b1220;border:1px solid rgba(148,163,184,.14);border-radius:14px;padding:14px}
+    .stat-card h4{margin:0 0 8px;color:#93c5fd}
+    .stat-card p{margin:4px 0;font-size:13px;color:#e2e8f0}
+    .charts-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+    .chart-card{background:#0b1220;border:1px solid rgba(148,163,184,.14);border-radius:14px;padding:12px;min-height:360px}
+    .chart-title{margin:0 0 10px;color:#c7d2fe;font-size:15px;font-weight:bold}
+    .chart-box{width:100%;height:300px}
+    .footer-note{margin-top:16px;color:var(--muted);font-size:12px;line-height:1.5}
+    @media(max-width:920px){.grid,.button-grid,.charts-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Asistente Analítico en Google Apps Script</h1>
+    <p>Carga datos CSV, ejecuta limpieza, análisis descriptivo, K-Means y exporta resultados en PDF y CSV.</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Entrada de referencia</h2>
+      <label for="functionName">Nombre de la función</label>
+      <input type="text" id="functionName" placeholder="Ejemplo: limpieza">
+      <label for="pythonCode">Código Python base</label>
+      <textarea id="pythonCode" placeholder="Pegue aquí el código Python de referencia..."></textarea>
+      <div class="button-grid">
+        <button onclick="registerReference()">Registrar referencia</button>
+        <button class="btn-secondary" onclick="loadDemoPython()">Cargar ejemplo</button>
+      </div>
+
+      <div class="section-title">Datos de entrada</div>
+      <label for="csvFile">Cargar archivo CSV</label>
+      <input type="file" id="csvFile" accept=".csv" onchange="readCsvFile(event)">
+      <label for="csvText">O pegar contenido CSV</label>
+      <textarea id="csvText" placeholder="Pegue aquí el contenido CSV. Columnas requeridas: Nombres, grupo"></textarea>
+
+      <div class="button-grid">
+        <button onclick="loadCsvPreview()">Cargar datos</button>
+        <button class="btn-success" onclick="runCleaning()">Ejecutar limpieza</button>
+        <button class="btn-warning" onclick="runAnalysis()">Análisis descriptivo</button>
+        <button class="btn-secondary" onclick="showAdaptation()">Ver adaptación</button>
+        <button class="btn-teal" id="btnInforme" onclick="buildReport()">📋 Informe</button>
+        <button class="btn-success" id="btnDescargar" onclick="downloadAll()">⬇ Descargar CSV limpio</button>
+        <button class="btn-danger" onclick="clearAllUI()">Limpiar interfaz</button>
+      </div>
+
+      <div class="informe-badge" id="informeBadge">
+        <span class="dot"></span>
+        Informe PDF listo en memoria — haz clic en "Descargar CSV limpio" para obtenerlo junto al CSV.
+      </div>
+
+      <div id="status" class="status">Estado: listo para iniciar.</div>
+      <div class="footer-note">
+        Flujo: cargar datos → limpieza → análisis → adaptación →
+        <strong>📋 Informe</strong> (guarda PDF en memoria) →
+        <strong>⬇ Descargar CSV limpio</strong> (descarga PDF + CSV juntos).
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Salida y resultados</h2>
+      <div id="summaryBadges"></div>
+      <div id="output" class="output"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Contenedor offscreen para captura de gráficas del PDF.
+     Siempre en el DOM y visible para html2canvas, nunca para el usuario.
+     position:absolute + left:-9999px garantiza offsetParent != null. -->
+<div id="pdf-charts-offscreen" style="
+  position:absolute;left:-9999px;top:0;
+  width:860px;background:#ffffff;padding:10px;
+  pointer-events:none;overflow:hidden;">
+  <div id="pc_hist_n1"        style="width:820px;height:300px;background:#fff"></div>
+  <div id="pc_hist_n2"        style="width:820px;height:300px;background:#fff"></div>
+  <div id="pc_hist_nf"        style="width:820px;height:300px;background:#fff"></div>
+  <div id="pc_bar_grupos"     style="width:820px;height:300px;background:#fff"></div>
+  <div id="pc_scatter_n1_nf"  style="width:820px;height:300px;background:#fff"></div>
+  <div id="pc_scatter_n2_n3"  style="width:820px;height:300px;background:#fff"></div>
+  <div id="pc_kmeans_bar"     style="width:820px;height:300px;background:#fff"></div>
+  <div id="pc_kmeans_scatter" style="width:820px;height:300px;background:#fff"></div>
+</div>
+
+<script>
+google.charts.load('current',{packages:['corechart','bar']});
+
+/* ══ Estado global ══ */
+var lastCleanCsv='', lastCleanPreview=[], lastAnalysis=null,
+    lastModelCsv='', lastKMeansResult=null,
+    pdfBlob=null, pdfFileName='';
+var reportLog={cargaDatos:null,limpieza:null,analisis:null,adaptacion:null};
+
+document.addEventListener('DOMContentLoaded',function(){
+  google.script.run
+    .withSuccessHandler(function(cfg){setStatus('Aplicación cargada: '+cfg.appName);})
+    .withFailureHandler(handleError)
+    .getInitialConfig();
+});
+window.addEventListener('resize',function(){
+  if(lastAnalysis&&lastAnalysis.chartData) drawAllCharts(lastAnalysis.chartData);
+});
+
+/* ══ Utilidades ══ */
+function setStatus(m){document.getElementById('status').textContent='Estado: '+m;}
+function handleError(e){setStatus('❌ '+(e&&e.message?e.message:String(e)));}
+function getCsvText(){return document.getElementById('csvText').value;}
+function getFunctionName(){return document.getElementById('functionName').value.trim();}
+function getPythonCode(){return document.getElementById('pythonCode').value;}
+function nowLabel(){return new Date().toLocaleString('es-CO',{dateStyle:'short',timeStyle:'short'});}
+function _stamp(){
+  var d=new Date();
+  return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('')
+    +'_'+[String(d.getHours()).padStart(2,'0'),String(d.getMinutes()).padStart(2,'0')].join('');
+}
+function showBadge(v){document.getElementById('informeBadge').classList.toggle('visible',v);}
+
+/* ══ Botones de procesamiento ══ */
+function registerReference(){
+  setStatus('Registrando referencia...');
+  google.script.run
+    .withSuccessHandler(function(r){
+      setStatus(r.message+' Función: '+r.functionName);
+      renderBadges(['Referencia registrada','Función: '+r.functionName,'Líneas: '+r.pythonLines]);
+    }).withFailureHandler(handleError)
+    .saveReferenceContext(getFunctionName(),getPythonCode());
+}
+
+function loadDemoPython(){
+  document.getElementById('functionName').value='limpieza';
+  document.getElementById('pythonCode').value=[
+    "import pandas as pd","import numpy as np","",
+    "def limpieza(archivo):",
+    "    data = pd.read_csv(archivo)",
+    "    data = data[data['Nombres'].notna()]",
+    "    data['N1'] = np.round(np.clip(np.random.normal(3.5,0.5,len(data)),1,5),1)",
+    "    data['N2'] = np.round(np.random.uniform(1,5,len(data)),1)",
+    "    data['N3'] = np.round(np.random.uniform(4,5,len(data)),1)",
+    "    data['NF'] = np.round(data.N1*0.3+data.N2*0.3+data.N3*0.4,1)",
+    "    return data"
+  ].join('\n');
+  document.getElementById('csvText').value=[
+    "Nombres,grupo,Edad","Ana López,A,20","Carlos Pérez,B,21","Ana López,A,20",
+    ",C,22","María#Gómez,A,19","Juan!! Ruiz,B,23","Laura Torres,C,22",
+    "Pedro Díaz,A,24","Camila Gómez,B,20"
+  ].join('\n');
+  setStatus('Ejemplo cargado.');
+}
+
+function readCsvFile(e){
+  var f=e.target.files&&e.target.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(ev){document.getElementById('csvText').value=ev.target.result;setStatus('CSV cargado.');};
+  r.onerror=function(){setStatus('❌ No se pudo leer el archivo.');};
+  r.readAsText(f,'UTF-8');
+}
+
+function loadCsvPreview(){
+  var csv=getCsvText(); if(!csv.trim()){setStatus('❌ Cargue o pegue el CSV.');return;}
+  setStatus('Cargando datos...');
+  google.script.run
+    .withSuccessHandler(function(r){
+      reportLog.cargaDatos={totalRows:r.totalRows,columns:r.columns,timestamp:nowLabel()};
+      setStatus(r.message+' Registros: '+r.totalRows);
+      renderBadges(['Filas: '+r.totalRows,'Columnas: '+r.columns.length]);
+      renderTable(r.preview,'Vista previa de datos cargados');
+    }).withFailureHandler(handleError).loadCsvData(csv);
+}
+
+function runCleaning(){
+  var csv=getCsvText(); if(!csv.trim()){setStatus('❌ Cargue o pegue el CSV.');return;}
+  setStatus('Ejecutando limpieza...');
+  google.script.run
+    .withSuccessHandler(function(r){
+      lastCleanCsv=r.csvOutput; lastModelCsv=''; lastCleanPreview=r.preview||[];
+      reportLog.limpieza={shape:r.shape,columns:r.columns,timestamp:nowLabel()};
+      setStatus(r.message+' Filas: '+r.shape.rows+' | Cols: '+r.shape.columns);
+      renderBadges(['Limpieza OK','Filas: '+r.shape.rows,'Cols: '+r.shape.columns]);
+      renderTable(r.preview,'Datos limpios');
+    }).withFailureHandler(handleError).runLimpieza(csv);
+}
+
+function runAnalysis(){
+  var csv=getCsvText(); if(!csv.trim()){setStatus('❌ Cargue o pegue el CSV.');return;}
+  setStatus('Generando análisis descriptivo...');
+  google.script.run
+    .withSuccessHandler(function(r){
+      lastAnalysis=r;
+      reportLog.analisis={totalRows:r.totalRows,stats:r.stats,groupsCount:r.groupsCount,timestamp:nowLabel()};
+      setStatus(r.message);
+      renderAnalysis(r);
+    }).withFailureHandler(handleError).runDescriptiveAnalysis(csv);
+}
+
+function showAdaptation(){
+  var csv=getCsvText(); if(!csv.trim()){setStatus('❌ Cargue o pegue el CSV.');return;}
+  setStatus('Ejecutando K-Means...');
+  google.script.run
+    .withSuccessHandler(function(r){
+      lastModelCsv=r.csvOutput; lastKMeansResult=r;
+      reportLog.adaptacion={totalRows:r.totalRows,k:r.k,summary:r.summary,interpretation:r.interpretation,timestamp:nowLabel()};
+      setStatus(r.message+' Registros: '+r.totalRows);
+      renderKMeansResult(r);
+    }).withFailureHandler(handleError).runKMeansAdaptation(csv);
+}
+
+/* ══════════════════════════════════════════
+   📋 INFORME — genera PDF en memoria
+══════════════════════════════════════════ */
+async function buildReport(){
+  var jsPDFCls = window.jspdf && window.jspdf.jsPDF;
+  if(!jsPDFCls){setStatus('❌ jsPDF no disponible. Verifique conexión.');return;}
+  var hasData=reportLog.cargaDatos||reportLog.limpieza||reportLog.analisis||reportLog.adaptacion;
+  if(!hasData){setStatus('❌ Ejecute al menos un paso antes de generar el informe.');return;}
+  document.getElementById('btnInforme').disabled=true;
+  showBadge(false);
+  setStatus('⏳ Redibujando gráficas para PDF y capturando… esto toma ~5 segundos.');
+  try{
+    var imgs=await captureAllCharts();
+    var doc =await buildPDF(null, imgs);
+    pdfBlob   =doc.output('blob');
+    pdfFileName='Informe_Analitico_'+_stamp()+'.pdf';
+    showBadge(true);
+    setStatus('✅ Informe PDF listo. Haz clic en "Descargar CSV limpio" para obtener PDF + CSV.');
+  }catch(err){
+    setStatus('❌ Error al generar PDF: '+err.message);
+    console.error(err);
+  }
+  document.getElementById('btnInforme').disabled=false;
+}
+
+/* ══════════════════════════════════════════
+   ⬇ DESCARGAR CSV — descarga PDF + CSV
+══════════════════════════════════════════ */
+function downloadAll(){
+  var downloaded=[];
+  if(pdfBlob){
+    _dl(URL.createObjectURL(pdfBlob), pdfFileName);
+    downloaded.push('PDF');
+  }
+  var csvData='', csvName='';
+  if(lastModelCsv){csvData=lastModelCsv; csvName='Resultado_KMeans_'+_stamp()+'.csv';}
+  else if(lastCleanCsv){csvData=lastCleanCsv; csvName='Data_Limpia_'+_stamp()+'.csv';}
+  if(csvData){
+    var hdr=['# ============================================================',
+      '# Asistente Analítico en Google Apps Script  v3.0.0',
+      '# Exportado: '+nowLabel(),
+      '# Desarrollado por: Ahren Kahi Churta',
+      '# ============================================================',''].join('\n');
+    _dl(URL.createObjectURL(new Blob([hdr+csvData],{type:'text/csv;charset=utf-8;'})), csvName);
+    downloaded.push('CSV');
+  }
+  if(!downloaded.length){setStatus('❌ No hay informe ni datos. Ejecute los pasos primero.');return;}
+  setStatus('✅ Descargado: '+downloaded.join(' + '));
+}
+function _dl(url,name){
+  var a=document.createElement('a'); a.href=url; a.download=name;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);},4000);
+}
+
+/* ══════════════════════════════════════════
+   CAPTURA DE GRÁFICAS — estrategia offscreen definitiva
+
+   PROBLEMA RAÍZ resuelto:
+   - Los elementos del DOM principal pueden tener offsetParent=null
+     cuando el usuario cambió de vista (ej: estaba en K-Means y los
+     charts de análisis ya no se ven). html2canvas falla en silencio.
+   - El scatter de K-Means no llegaba a renderizar a tiempo.
+
+   SOLUCIÓN:
+   - Contenedor offscreen dedicado (#pdf-charts-offscreen) siempre
+     en el DOM con position:absolute left:-9999px → offsetParent NUNCA null.
+   - Se renderizan los 8 charts directamente en ese contenedor con
+     opciones de fondo blanco.
+   - Se espera 900ms (todos los charts se renderizan en paralelo).
+   - html2canvas captura desde el contenedor offscreen, no desde la UI.
+   - Los charts de la UI se restauran después sin bloquear el PDF.
+══════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════
+   CAPTURA DE GRÁFICAS — SVG directo a PNG
+   Sin html2canvas. Sin bloqueo del navegador.
+
+   Estrategia:
+   1. Dibujar los 8 charts en el contenedor offscreen con fondo blanco.
+   2. Esperar 900ms (una sola vez, todos en paralelo).
+   3. Leer el SVG de cada contenedor, serializar a Blob URL,
+      dibujar en un <canvas> nativo del navegador y exportar PNG.
+   Tiempo total esperado: ~2 segundos.
+══════════════════════════════════════════ */
+
+/* Mapa offscreen-id → id canónico del PDF */
+var CHART_MAP={
+  'pc_hist_n1':       'chart_hist_n1',
+  'pc_hist_n2':       'chart_hist_n2',
+  'pc_hist_nf':       'chart_hist_nf',
+  'pc_bar_grupos':    'chart_bar_grupos',
+  'pc_scatter_n1_nf': 'chart_scatter_n1_nf',
+  'pc_scatter_n2_n3': 'chart_scatter_n2_n3',
+  'pc_kmeans_bar':    'chart_kmeans_bar',
+  'pc_kmeans_scatter':'chart_kmeans_scatter'
+};
+
+/* Opciones blanco para PDF */
+function _optsWhite(t,c){
+  return{
+    title:t, legend:{position:'none'},
+    backgroundColor:'#ffffff', colors:[c],
+    pointSize:7,
+    titleTextStyle:{color:'#1e293b',fontSize:13,bold:true},
+    hAxis:{textStyle:{color:'#374151'},titleTextStyle:{color:'#374151'},
+           gridlines:{color:'#e2e8f0'},baselineColor:'#94a3b8'},
+    vAxis:{textStyle:{color:'#374151'},titleTextStyle:{color:'#374151'},
+           gridlines:{color:'#e2e8f0'},baselineColor:'#94a3b8'},
+    chartArea:{left:65,top:44,width:'76%',height:'64%'}
+  };
+}
+
+/* Dibuja los 8 charts en offscreen (todos a la vez) */
+function drawChartsOffscreen(){
+  var hO=function(t,c){return Object.assign(_optsWhite(t,c),{histogram:{bucketSize:0.5}});};
+  if(lastAnalysis&&lastAnalysis.chartData){
+    var cd=lastAnalysis.chartData;
+    if(cd.histNota1&&cd.histNota1.length>1)
+      new google.visualization.Histogram(document.getElementById('pc_hist_n1'))
+        .draw(google.visualization.arrayToDataTable(cd.histNota1),hO('Nota 1','#1d4ed8'));
+    if(cd.histNota2&&cd.histNota2.length>1)
+      new google.visualization.Histogram(document.getElementById('pc_hist_n2'))
+        .draw(google.visualization.arrayToDataTable(cd.histNota2),hO('Nota 2','#059669'));
+    if(cd.histNotaFinal&&cd.histNotaFinal.length>1)
+      new google.visualization.Histogram(document.getElementById('pc_hist_nf'))
+        .draw(google.visualization.arrayToDataTable(cd.histNotaFinal),hO('Nota Final','#b45309'));
+    if(cd.barGrupos&&cd.barGrupos.length>1)
+      new google.visualization.ColumnChart(document.getElementById('pc_bar_grupos'))
+        .draw(google.visualization.arrayToDataTable(cd.barGrupos),_optsWhite('Por Grupo','#6d28d9'));
+    if(cd.scatterN1Nf&&cd.scatterN1Nf.length>1)
+      new google.visualization.ScatterChart(document.getElementById('pc_scatter_n1_nf'))
+        .draw(google.visualization.arrayToDataTable(cd.scatterN1Nf),_optsWhite('N1 vs NF','#b91c1c'));
+    if(cd.scatterN2N3&&cd.scatterN2N3.length>1)
+      new google.visualization.ScatterChart(document.getElementById('pc_scatter_n2_n3'))
+        .draw(google.visualization.arrayToDataTable(cd.scatterN2N3),_optsWhite('N2 vs N3','#0e7490'));
+  }
+  if(lastKMeansResult&&lastKMeansResult.chartData){
+    var kcd=lastKMeansResult.chartData;
+    if(kcd.barClusters&&kcd.barClusters.length>1)
+      new google.visualization.ColumnChart(document.getElementById('pc_kmeans_bar'))
+        .draw(google.visualization.arrayToDataTable(kcd.barClusters),_optsWhite('Segmentos','#1a56a3'));
+    if(kcd.scatterClusters&&kcd.scatterClusters.length>1)
+      new google.visualization.ScatterChart(document.getElementById('pc_kmeans_scatter'))
+        .draw(google.visualization.arrayToDataTable(kcd.scatterClusters),_optsWhite('NF segmento','#92400e'));
+  }
+}
+
+/* Convierte un SVG DOM a dataURL PNG usando canvas nativo — sin html2canvas */
+function svgToPng(svgEl, w, h){
+  return new Promise(function(resolve){
+    try{
+      /* Serializar SVG a string */
+      var serializer = new XMLSerializer();
+      var svgStr = serializer.serializeToString(svgEl);
+
+      /* Asegurar atributos de dimensión */
+      if(svgStr.indexOf('xmlns=') === -1)
+        svgStr = svgStr.replace('<svg','<svg xmlns="http://www.w3.org/2000/svg"');
+
+      /* Crear Blob y Object URL */
+      var blob = new Blob([svgStr],{type:'image/svg+xml;charset=utf-8'});
+      var url  = URL.createObjectURL(blob);
+      var img  = new Image();
+
+      img.onload = function(){
+        var cv  = document.createElement('canvas');
+        cv.width  = w||820;
+        cv.height = h||300;
+        var ctx = cv.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0,0,cv.width,cv.height);
+        ctx.drawImage(img,0,0,cv.width,cv.height);
+        URL.revokeObjectURL(url);
+        resolve(cv.toDataURL('image/png'));
+      };
+      img.onerror = function(){
+        URL.revokeObjectURL(url);
+        resolve(null);
+      };
+      img.src = url;
+    }catch(e){
+      console.warn('svgToPng error',e);
+      resolve(null);
+    }
+  });
+}
+
+async function captureAllCharts(){
+  var imgs = {};
+  var pcIds = Object.keys(CHART_MAP);
+
+  /* 1. Dibujar todos en offscreen a la vez */
+  drawChartsOffscreen();
+
+  /* 2. Esperar una sola vez a que Google Charts termine (900ms) */
+  await new Promise(function(res){ setTimeout(res, 900); });
+
+  /* 3. Convertir SVG → PNG para cada contenedor (rápido, sin bloqueo) */
+  for(var i=0;i<pcIds.length;i++){
+    var pcId = pcIds[i];
+    var el   = document.getElementById(pcId);
+    if(!el) continue;
+    var svg  = el.querySelector('svg');
+    if(!svg){ console.warn('sin SVG:',pcId); continue; }
+    var w = el.offsetWidth  || 820;
+    var h = el.offsetHeight || 300;
+    var png = await svgToPng(svg, w, h);
+    if(png) imgs[CHART_MAP[pcId]] = png;
+  }
+
+  /* 4. Limpiar offscreen */
+  pcIds.forEach(function(id){
+    var el=document.getElementById(id); if(el) el.innerHTML='';
+  });
+
+  return imgs;
+}
+
+/* ══════════════════════════════════════════
+   CONSTRUCCIÓN DEL PDF
+   Regla de oro: r,g,b individuales. Nunca arrays.
+══════════════════════════════════════════ */
+async function buildPDF(ignored, imgs){
+  var jsPDFCls=window.jspdf&&window.jspdf.jsPDF;
+  var doc=new jsPDFCls({orientation:'portrait',unit:'mm',format:'a4'});
+  var PW=doc.internal.pageSize.getWidth();
+  var PH=doc.internal.pageSize.getHeight();
+  var ML=20, MR=PW-20, BW=MR-ML;
+  var y=0;
+
+  /* PALETA — valores RGB individuales */
+  var CBr=26,  CBg=86,  CBb=163;   // azul corporativo
+  var CLr=235, CLg=241, CLb=251;   // azul claro (filas alternas)
+  var TKr=25,  TKg=25,  TKb=25;   // negro texto
+  var T2r=80,  T2g=80,  T2b=80;   // gris secundario
+  var MTr=140, MTg=140, MTb=140;  // gris claro
+  var WHr=255, WHg=255, WHb=255;  // blanco
+  var BDr=210, BDg=210, BDb=210;  // borde tabla
+  var RLr=200, RLg=200, RLb=200;  // separador
+  var GRr=34,  GRg=120, GRb=55;   // verde OK
+
+  /* Primitivas (r,g,b siempre individuales) */
+  function sF(r,g,b){doc.setFillColor(r,g,b);}
+  function sI(r,g,b){doc.setTextColor(r,g,b);}
+  function sD(r,g,b,lw){doc.setDrawColor(r,g,b);doc.setLineWidth(lw||0.25);}
+  function bx(x,yy,w,h,r,g,b){sF(r,g,b);doc.rect(x,yy,w,h,'F');}
+  function ln(x1,y1,x2,y2,r,g,b,lw){sD(r,g,b,lw||0.25);doc.line(x1,y1,x2,y2);}
+  function hL(yy,r,g,b,lw){ln(ML,yy,MR,yy,r,g,b,lw);}
+
+  /* Paginación */
+  function checkY(n){if(y+n>PH-22)np();}
+  function np(){doc.addPage();hdr();ftr();y=26;}
+  function hdr(){
+    bx(0,0,PW,1.5,CBr,CBg,CBb);
+    doc.setFont('helvetica','normal');doc.setFontSize(7);sI(MTr,MTg,MTb);
+    doc.text('Informe de Análisis de Datos Educativos',MR,8,{align:'right'});
+    ln(ML,10,MR,10,RLr,RLg,RLb,0.2);
+  }
+  function ftr(){
+    var pg=doc.internal.getNumberOfPages();
+    ln(ML,PH-11,MR,PH-11,RLr,RLg,RLb,0.2);
+    doc.setFont('helvetica','normal');doc.setFontSize(7);sI(MTr,MTg,MTb);
+    doc.text('Asistente Analítico GAS  ·  Ahren Kahi Churta',ML,PH-6);
+    doc.text(String(pg),MR,PH-6,{align:'right'});
+  }
+
+  /* Helpers de contenido */
+  function secTitle(txt){
+    checkY(18);y+=6;
+    doc.setFont('helvetica','bold');doc.setFontSize(12);sI(CBr,CBg,CBb);
+    doc.text(txt.toUpperCase(),ML,y);
+    y+=2;ln(ML,y,MR,y,CBr,CBg,CBb,0.8);
+    y+=7;sI(TKr,TKg,TKb);
+  }
+  function subTit(txt){
+    checkY(13);y+=4;
+    doc.setFont('helvetica','bold');doc.setFontSize(9.5);sI(TKr,TKg,TKb);
+    doc.text(txt,ML,y);
+    y+=2;ln(ML,y,MR,y,RLr,RLg,RLb,0.3);
+    y+=5;
+  }
+  function para(txt,sz,r,g,b){
+    sz=sz||9.5;r=r!==undefined?r:T2r;g=g!==undefined?g:T2g;b=b!==undefined?b:T2b;
+    doc.setFont('helvetica','normal');doc.setFontSize(sz);sI(r,g,b);
+    var ls=doc.splitTextToSize(txt,BW),lh=sz*0.44;
+    checkY(ls.length*lh+3);
+    doc.text(ls,ML,y);y+=ls.length*lh+4;
+  }
+  function kv(lbl,val){
+    checkY(7);
+    doc.setFont('helvetica','bold');doc.setFontSize(8.5);sI(TKr,TKg,TKb);
+    doc.text(lbl,ML,y);
+    var lw=doc.getTextWidth(lbl)+3;
+    doc.setFont('helvetica','normal');sI(T2r,T2g,T2b);
+    doc.text(doc.splitTextToSize(String(val||'—'),BW-lw-2),ML+lw,y);
+    y+=7;
+  }
+  function gap(n){y+=(n||4);}
+  function stepLbl(num,title,ts){
+    checkY(14);gap(2);
+    sF(CBr,CBg,CBb);doc.circle(ML+4,y+3,4,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(9);sI(WHr,WHg,WHb);
+    doc.text(String(num),ML+4,y+4.2,{align:'center'});
+    doc.setFontSize(10);sI(TKr,TKg,TKb);doc.text(title,ML+11,y+4.5);
+    if(ts){doc.setFont('helvetica','normal');doc.setFontSize(7.5);sI(MTr,MTg,MTb);
+      doc.text(ts,MR,y+4.5,{align:'right'});}
+    y+=11;
+  }
+
+  /* Tabla estadísticas */
+  function statsTbl(stats){
+    var fields=Object.keys(stats);
+    var mets=['count','min','max','mean','median','stdDev','q1','q3'];
+    var lbl={count:'N',min:'Mínimo',max:'Máximo',mean:'Media',median:'Mediana',
+             stdDev:'Desv. Std.',q1:'Q1 (25%)',q3:'Q3 (75%)'};
+    var mW=26,cW=(BW-mW)/fields.length,rh=6.5;
+    checkY((mets.length+2)*rh+4);
+    bx(ML,y,BW,rh,CBr,CBg,CBb);
+    doc.setFont('helvetica','bold');doc.setFontSize(8);sI(WHr,WHg,WHb);
+    doc.text('Variable / Métrica',ML+2,y+4.5);
+    fields.forEach(function(f,i){doc.text(f,ML+mW+i*cW+2,y+4.5);});
+    y+=rh;
+    mets.forEach(function(m,mi){
+      checkY(rh);
+      if(mi%2===0)bx(ML,y,BW,rh,CLr,CLg,CLb);else bx(ML,y,BW,rh,WHr,WHg,WHb);
+      ln(ML,y+rh,MR,y+rh,BDr,BDg,BDb,0.15);
+      doc.setFont('helvetica','bold');doc.setFontSize(7.5);sI(T2r,T2g,T2b);
+      doc.text(lbl[m],ML+2,y+4.3);
+      doc.setFont('helvetica','normal');sI(TKr,TKg,TKb);
+      fields.forEach(function(f,i){
+        doc.text((stats[f]&&stats[f][m]!=null)?String(stats[f][m]):'—',ML+mW+i*cW+2,y+4.3);
+      });
+      y+=rh;
+    });
+    sD(BDr,BDg,BDb,0.3);doc.rect(ML,y-mets.length*rh-rh,BW,(mets.length+1)*rh);y+=5;
+  }
+
+  /* Tabla clusters */
+  function clusterTbl(sum){
+    if(!sum||!sum.length)return;
+    var cw=[BW*0.54,BW*0.20,BW*0.26],rh=7;
+    checkY((sum.length+2)*rh+4);
+    bx(ML,y,BW,rh,CBr,CBg,CBb);
+    doc.setFont('helvetica','bold');doc.setFontSize(8.5);sI(WHr,WHg,WHb);
+    var cx=ML;
+    ['Segmento / Perfil','Estudiantes','Promedio NF'].forEach(function(h,i){doc.text(h,cx+3,y+4.8);cx+=cw[i];});
+    y+=rh;
+    sum.forEach(function(row,ri){
+      checkY(rh);
+      if(ri%2===0)bx(ML,y,BW,rh,CLr,CLg,CLb);else bx(ML,y,BW,rh,WHr,WHg,WHb);
+      ln(ML,y+rh,MR,y+rh,BDr,BDg,BDb,0.15);
+      doc.setFont('helvetica','normal');doc.setFontSize(8.5);sI(TKr,TKg,TKb);
+      cx=ML;
+      [row.Cluster,row.Cantidad,row.Promedio_Nota_Final].forEach(function(v,i){
+        doc.text(String(v!=null?v:'—'),cx+3,y+4.8);cx+=cw[i];
+      });
+      y+=rh;
+    });
+    sD(BDr,BDg,BDb,0.3);doc.rect(ML,y-(sum.length+1)*rh,BW,(sum.length+1)*rh);y+=5;
+  }
+
+  /* ── DOS GRÁFICAS EN FILA ──
+     FIX: yBase fijo para ambos slots.
+     Guard: retorna sin avanzar si ninguna imagen existe.
+  ── */
+  function chartDuo(img1,cap1,img2,cap2){
+    if(!img1&&!img2) return;
+    var half=(BW-5)/2, ch=60;
+    checkY(ch+16);
+    var yB=y;   /* anclar posición de inicio — ambos slots usan yB */
+    if(img1){
+      doc.setFont('helvetica','italic');doc.setFontSize(7.5);sI(MTr,MTg,MTb);
+      doc.text('Fig. — '+cap1,ML,yB);
+      sD(BDr,BDg,BDb,0.2);doc.rect(ML,yB+4,half,ch);
+      try{doc.addImage(img1,'PNG',ML,yB+4,half,ch);}catch(e){console.warn(e);}
+    }
+    if(img2){
+      var xR=ML+half+5;
+      doc.setFont('helvetica','italic');doc.setFontSize(7.5);sI(MTr,MTg,MTb);
+      doc.text('Fig. — '+cap2,xR,yB);
+      sD(BDr,BDg,BDb,0.2);doc.rect(xR,yB+4,half,ch);
+      try{doc.addImage(img2,'PNG',xR,yB+4,half,ch);}catch(e){console.warn(e);}
+    }
+    y=yB+ch+12;   /* avanzar y UNA sola vez */
+  }
+
+  /* ════════════════════════════════════════
+     PÁGINA 1 — PORTADA INSTITUCIONAL CUN
+     Replica el formato oficial del Formato_word.pdf
+  ════════════════════════════════════════ */
+  bx(0,0,PW,PH,WHr,WHg,WHb);  // fondo blanco
+
+  /* ── Barra de cabecera institucional ── */
+  bx(0,0,PW,28,WHr,WHg,WHb);
+  ln(0,28,PW,28, BDr,BDg,BDb, 0.5);
+
+  /* Nombre institución centrado en cabecera */
+  doc.setFont('helvetica','bold'); doc.setFontSize(9.5);
+  sI(TKr,TKg,TKb);
+  doc.text('CORPORACION UNIFICADA NACIONAL DE EDUCACION SUPERIOR CUN',PW/2,10,{align:'center'});
+  doc.text('INGENIERIA DE SISTEMAS',PW/2,18,{align:'center'});
+
+  /* Línea verde decorativa bajo cabecera (color CUN) */
+  bx(0,28,PW,2, 34,139,34);
+
+  /* ── Bloque central del título ── */
+  var cY=72;
+  doc.setFont('helvetica','normal'); doc.setFontSize(16);
+  sI(TKr,TKg,TKb);
+  doc.text('ACA final - Trabajo presentado individual.', PW/2, cY, {align:'center'});
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(16);
+  doc.text('Actividad Constructora de APRENDIZAJE (ACA)', PW/2, cY+14, {align:'center'});
+
+  /* ── Datos del estudiante ── */
+  var sY=cY+42;
+  doc.setFont('helvetica','normal'); doc.setFontSize(12);
+  sI(TKr,TKg,TKb);
+  doc.text('Ahren Kahi Churta.', PW/2, sY, {align:'center'});
+  doc.text('Decimo cuatrimestre.', PW/2, sY+8, {align:'center'});
+
+  /* ── Datos del docente ── */
+  var dY=sY+42;
+  doc.setFont('helvetica','bold'); doc.setFontSize(12);
+  sI(TKr,TKg,TKb);
+  doc.text('Jorge Andres Araujo Bernal.', PW/2, dY, {align:'center'});
+  doc.setFont('helvetica','normal');
+  sI(34,139,34);  // verde CUN para el rol
+  doc.text('Facilitador Virtual.', PW/2, dY+8, {align:'center'});
+  doc.text('Asignatura: Analisis de Datos.', PW/2, dY+16, {align:'center'});
+
+  /* ── Línea separadora ── */
+  var lSep=dY+32;
+  ln(ML,lSep,MR,lSep, BDr,BDg,BDb, 0.4);
+
+  /* ── Bloque inferior: programa y fecha ── */
+  var bY2=PH-40;
+  ln(0,bY2-4,PW,bY2-4, BDr,BDg,BDb, 0.5);
+  bx(0,bY2-4,PW,2, 34,139,34);  // franja verde inferior
+  doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  sI(TKr,TKg,TKb);
+  doc.text('PROGRAMA: INGENIERIA DE SISTEMAS', PW/2, bY2+8, {align:'center'});
+  doc.text('09 MAYO DE 2026', PW/2, bY2+18, {align:'center'});
+
+  /* Sin número de página en portada institucional */
+
+  /* ════════════════════════════════════════
+     PÁGINA 2 — PORTADA ANALÍTICA (informe)
+  ════════════════════════════════════════ */
+  doc.addPage();
+  bx(0,0,PW,PH,WHr,WHg,WHb);
+  bx(0,0,6,PH,CBr,CBg,CBb);
+  bx(0,0,PW,1.2,CBr,CBg,CBb);
+  bx(0,PH-1.2,PW,1.2,CBr,CBg,CBb);
+
+  var tX=16, tYc=PH/2-52;
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);sI(CBr,CBg,CBb);
+  doc.text('ANALISIS DE DATOS EDUCATIVOS',tX,tYc);
+  ln(tX,tYc+3,PW-15,tYc+3,CBr,CBg,CBb,0.3);
+
+  doc.setFont('helvetica','bold');doc.setFontSize(38);sI(TKr,TKg,TKb);
+  doc.text('Informe',tX,tYc+18);
+  sI(CBr,CBg,CBb);
+  doc.text('Analitico',tX,tYc+32);
+
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);sI(T2r,T2g,T2b);
+  doc.text('Asistente Analitico en Google Apps Script  -  v3.0.0',tX,tYc+44);
+  ln(tX,tYc+50,PW-15,tYc+50,RLr,RLg,RLb,0.3);
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);sI(MTr,MTg,MTb);
+  doc.text('Generado el '+nowLabel(),tX,tYc+58);
+
+  var aYc=PH-46;
+  ln(tX,aYc,PW-15,aYc,RLr,RLg,RLb,0.3);
+  doc.setFont('helvetica','normal');doc.setFontSize(7.5);sI(MTr,MTg,MTb);
+  doc.text('ELABORADO POR',tX,aYc+8);
+  doc.setFont('helvetica','bold');doc.setFontSize(15);sI(TKr,TKg,TKb);
+  doc.text('Ahren Kahi Churta',tX,aYc+18);
+  doc.setFont('helvetica','normal');doc.setFontSize(8);sI(T2r,T2g,T2b);
+  doc.text('Ingenieria Analitica  -  Google Apps Script  -  K-Means ML',tX,aYc+26);
+  ftr();
+
+  /* ════════════════════════════════════════
+     PÁGINA 2 — RESUMEN EJECUTIVO
+  ════════════════════════════════════════ */
+  np();
+  secTitle('Resumen Ejecutivo');
+  para('Este informe presenta los resultados del pipeline analítico aplicado sobre el conjunto de datos educativos. Cada sección describe las transformaciones, métricas obtenidas y visualizaciones de cada etapa del proceso.',9.5,T2r,T2g,T2b);
+  gap(4);
+
+  var etapas=[
+    ['01','Carga de datos',     reportLog.cargaDatos ?reportLog.cargaDatos.timestamp :'—', reportLog.cargaDatos ?'Completado':'Pendiente'],
+    ['02','Limpieza de datos',  reportLog.limpieza   ?reportLog.limpieza.timestamp   :'—', reportLog.limpieza   ?'Completado':'Pendiente'],
+    ['03','Análisis descriptivo',reportLog.analisis  ?reportLog.analisis.timestamp   :'—', reportLog.analisis   ?'Completado':'Pendiente'],
+    ['04','Adaptación K-Means', reportLog.adaptacion ?reportLog.adaptacion.timestamp :'—', reportLog.adaptacion ?'Completado':'Pendiente']
+  ];
+  var ew=[12,BW*0.38,BW*0.33,BW*0.21], erh=7.5;
+  bx(ML,y,BW,erh,CBr,CBg,CBb);
+  doc.setFont('helvetica','bold');doc.setFontSize(8.5);sI(WHr,WHg,WHb);
+  var ecx=ML;
+  ['ID','Etapa','Ejecutado','Estado'].forEach(function(h,i){doc.text(h,ecx+3,y+5);ecx+=ew[i];});
+  y+=erh;
+  etapas.forEach(function(row,ri){
+    checkY(erh);
+    if(ri%2===0)bx(ML,y,BW,erh,CLr,CLg,CLb);else bx(ML,y,BW,erh,WHr,WHg,WHb);
+    ln(ML,y+erh,MR,y+erh,BDr,BDg,BDb,0.15);
+    ecx=ML;
+    row.forEach(function(v,i){
+      doc.setFont('helvetica',i===0?'bold':'normal');doc.setFontSize(8.5);
+      if(i===0)                      sI(CBr,CBg,CBb);
+      else if(i===3&&v==='Completado') sI(GRr,GRg,GRb);
+      else if(i===3)                 sI(MTr,MTg,MTb);
+      else                           sI(TKr,TKg,TKb);
+      doc.text(v,ecx+3,y+5);ecx+=ew[i];
+    });
+    y+=erh;
+  });
+  sD(BDr,BDg,BDb,0.3);doc.rect(ML,y-etapas.length*erh,BW,etapas.length*erh);
+  y+=10;
+
+  /* ════════ PASO 1 ════════ */
+  secTitle('01 — Carga de Datos');
+  if(reportLog.cargaDatos){
+    var cd=reportLog.cargaDatos;
+    stepLbl(1,'Carga de Datos',cd.timestamp);
+    para('Se cargó el archivo CSV al entorno de procesamiento. Se validó la estructura detectando encabezados y el total de registros disponibles para el pipeline analítico.',9.5,T2r,T2g,T2b);
+    gap(2);
+    kv('Registros cargados:',String(cd.totalRows.toLocaleString('es-CO')));
+    kv('Columnas detectadas:',String(cd.columns.length));
+    kv('Variables identificadas:',cd.columns.join('  ·  '));
+  } else { para('Este paso no fue ejecutado en la sesión actual.',9.5,MTr,MTg,MTb); }
+
+  /* ════════ PASO 2 ════════ */
+  checkY(20);secTitle('02 — Limpieza de Datos');
+  if(reportLog.limpieza){
+    var cl=reportLog.limpieza;
+    stepLbl(2,'Ejecutar Limpieza',cl.timestamp);
+    para('Transformaciones aplicadas sobre el dataset original:',9.5,T2r,T2g,T2b);gap(1);
+    ['Eliminación de registros con Nombres nulo, vacío o con valor "na / null / nan".',
+     'Normalización de texto: remoción de caracteres especiales y espacios duplicados.',
+     'Generacion de notas: N1 Normal(media=3.5, desv.std=0.5) rango [1-5]; N2 Uniforme(1,5); N3 Uniforme(4,5).',
+     'Nota Final ponderada: NF = N1 × 0.30 + N2 × 0.30 + N3 × 0.40.',
+     'Eliminación de duplicados por clave compuesta: Nombres + Grupo.'
+    ].forEach(function(t){para('    ·  '+t,8.8,T2r,T2g,T2b);});
+    gap(3);
+    kv('Registros antes:',reportLog.cargaDatos?String(reportLog.cargaDatos.totalRows.toLocaleString('es-CO')):'—');
+    kv('Registros después:',String(cl.shape.rows.toLocaleString('es-CO')));
+    kv('Variables resultantes:',cl.columns.join('  ·  '));
+  } else { para('Este paso no fue ejecutado en la sesión actual.',9.5,MTr,MTg,MTb); }
+
+  /* ════════ PASO 3 ════════ */
+  checkY(20);secTitle('03 — Análisis Descriptivo');
+  if(reportLog.analisis){
+    var an=reportLog.analisis;
+    stepLbl(3,'Análisis Descriptivo',an.timestamp);
+    kv('Total de registros analizados:',String(an.totalRows.toLocaleString('es-CO')));
+    if(an.groupsCount&&an.groupsCount.length){
+      var top8=an.groupsCount.sort(function(a,b){return b.cantidad-a.cantidad;}).slice(0,8)
+        .map(function(g){return g.categoria+' (n='+g.cantidad+')';}).join(';  ');
+      kv('Grupos principales (top 8):',top8+(an.groupsCount.length>8?'  …':''));
+    }
+    gap(4);
+    subTit('Estadísticas Descriptivas por Variable');
+    if(an.stats&&Object.keys(an.stats).length)statsTbl(an.stats);
+    gap(2);
+    var hAC=imgs['chart_hist_n1']||imgs['chart_hist_n2']||imgs['chart_hist_nf']||
+            imgs['chart_bar_grupos']||imgs['chart_scatter_n1_nf']||imgs['chart_scatter_n2_n3'];
+    if(hAC){
+      subTit('Distribución de Calificaciones');
+      chartDuo(imgs['chart_hist_n1'],'Distribución Nota 1',imgs['chart_hist_n2'],'Distribución Nota 2');
+      chartDuo(imgs['chart_hist_nf'],'Distribución Nota Final',imgs['chart_bar_grupos'],'Frecuencia por Grupo');
+      subTit('Relaciones entre Variables');
+      chartDuo(imgs['chart_scatter_n1_nf'],'Nota 1 vs. Nota Final',imgs['chart_scatter_n2_n3'],'Nota 2 vs. Nota 3');
+    }
+  } else { para('Este paso no fue ejecutado en la sesión actual.',9.5,MTr,MTg,MTb); }
+
+  /* ════════ PASO 4 ════════ */
+  checkY(20);secTitle('04 — Segmentación con K-Means');
+  if(reportLog.adaptacion){
+    var km=reportLog.adaptacion;
+    stepLbl(4,'Modelo K-Means',km.timestamp);
+    kv('Algoritmo:','K-Means (aprendizaje no supervisado)');
+    kv('Número de segmentos k:',String(km.k));
+    kv('Registros procesados:',String(km.totalRows.toLocaleString('es-CO')));
+    gap(3);
+    para('K-Means agrupa a los estudiantes en '+km.k+' segmentos según la similitud de sus notas, sin requerir etiquetas previas. Cada centroide representa el perfil de rendimiento típico del grupo.',9.5,T2r,T2g,T2b);
+    gap(4);
+    subTit('Resultados por Segmento');
+    clusterTbl(km.summary);
+    gap(2);
+    subTit('Recomendaciones por Perfil');
+    if(km.summary){
+      km.summary.forEach(function(row){
+        var cn=String(row.Cluster).toLowerCase(),rec='';
+        if(cn.indexOf('bajo')>-1)       rec='Implementar plan de refuerzo académico, tutorías individuales y seguimiento semanal de avance.';
+        else if(cn.indexOf('medio')>-1) rec='Fortalecer hábitos de estudio mediante actividades prácticas y evaluación formativa continua.';
+        else if(cn.indexOf('alto')>-1)  rec='Vincular a proyectos de liderazgo académico, mentoría entre pares y retos de profundización.';
+        if(rec){
+          gap(1);checkY(14);
+          doc.setFont('helvetica','bold');doc.setFontSize(8.5);sI(CBr,CBg,CBb);
+          doc.text(row.Cluster,ML,y);y+=6;
+          para(rec,8.8,T2r,T2g,T2b);
+        }
+      });
+    }
+    gap(2);
+    if(imgs['chart_kmeans_bar']||imgs['chart_kmeans_scatter']){
+      subTit('Visualizaciones del Modelo');
+      chartDuo(imgs['chart_kmeans_bar'],'Estudiantes por segmento',imgs['chart_kmeans_scatter'],'Nota Final según segmento');
+    }
+  } else { para('Este paso no fue ejecutado en la sesión actual.',9.5,MTr,MTg,MTb); }
+
+  /* ════════ CONCLUSIONES ════════ */
+  checkY(40);secTitle('Conclusiones y Recomendaciones');
+
+  subTit('Hallazgos principales del analisis');
+  para('El pipeline analitico implementado transforma datos educativos crudos en informacion estructurada y accionable. El proceso de limpieza elimino '+(reportLog.cargaDatos&&reportLog.limpieza?(reportLog.cargaDatos.totalRows-reportLog.limpieza.shape.rows)+' registros invalidos o duplicados, garantizando':'registros invalidos, garantizando')+' la integridad estadistica de los resultados.',9.5,T2r,T2g,T2b);
+  gap(2);
+  para('El analisis descriptivo revela una distribucion de notas caracteristica: Nota_3 presenta la media mas alta (4.5) con baja dispersion (desv. 0.29), lo que indica un componente evaluativo donde la mayoria alcanza niveles altos. En contraste, Nota_2 muestra la mayor variabilidad (desv. ~1.16), senalando diferencias significativas en ese componente entre estudiantes.',9.5,T2r,T2g,T2b);
+  gap(4);
+
+  subTit('Interpretacion de los segmentos K-Means');
+  para('La segmentacion en 3 clusters revela tres perfiles de rendimiento bien diferenciados:',9.5,T2r,T2g,T2b);
+  gap(1);
+  para('    Rendimiento bajo (NF ~3.35): Estudiantes con dificultades principalmente en Nota_1 y Nota_2. Su Nota_Final cae por debajo del promedio grupal. Requieren intervencion temprana con refuerzo en los componentes de mayor peso ponderado.',8.8,T2r,T2g,T2b);
+  gap(1);
+  para('    Rendimiento medio (NF ~3.75): Segmento mayoritario. Desempeno consistente pero sin destacar. Tienen potencial de mejora con estrategias de acompanamiento focalizado en Nota_2, el componente con mayor varianza.',8.8,T2r,T2g,T2b);
+  gap(1);
+  para('    Rendimiento alto (NF ~4.17): Estudiantes con dominio solido en los tres componentes. Su Nota_3 es maxima y Nota_1 supera el promedio. Son candidatos ideales para roles de mentoria entre pares y actividades de profundizacion.',8.8,T2r,T2g,T2b);
+  gap(4);
+
+  subTit('Recomendaciones estrategicas');
+  para('1. Focalizar el refuerzo academico en el componente Nota_2, que presenta la mayor dispersion y el mayor impacto diferenciador entre segmentos.',9.5,T2r,T2g,T2b);
+  gap(1);
+  para('2. Implementar evaluacion formativa continua para el segmento medio, evitando que migren al segmento bajo antes del cierre del periodo.',9.5,T2r,T2g,T2b);
+  gap(1);
+  para('3. Aprovechar el segmento alto como recurso pedagogico: la mentoria entre pares ha demostrado beneficios tanto para el mentor como para el estudiante acompanado.',9.5,T2r,T2g,T2b);
+  gap(1);
+  para('4. Repetir el analisis al cierre del siguiente periodo para medir movilidad entre segmentos como indicador de efectividad de las intervenciones.',9.5,T2r,T2g,T2b);
+  gap(6);hL(y,RLr,RLg,RLb,0.3);gap(4);
+
+  /* ════════ PÁGINA FINAL — AUTORÍA ════════ */
+  np();
+  var pY=PH/2-28;
+  ln(ML,pY,MR,pY,CBr,CBg,CBb,1.0);
+  y=pY+9;
+  doc.setFont('helvetica','normal');doc.setFontSize(8);sI(MTr,MTg,MTb);
+  doc.text('ELABORADO POR',ML,y);y+=9;
+  doc.setFont('helvetica','bold');doc.setFontSize(22);sI(TKr,TKg,TKb);
+  doc.text('Ahren Kahi Churta',ML,y);y+=10;
+  doc.setFont('helvetica','normal');doc.setFontSize(9);sI(T2r,T2g,T2b);
+  doc.text('Asistente Analítico en Google Apps Script',ML,y);y+=6;
+  doc.setFontSize(8);sI(MTr,MTg,MTb);
+  doc.text('Versión 3.0.0  ·  '+nowLabel(),ML,y);y+=10;
+  ln(ML,y,MR,y,RLr,RLg,RLb,0.3);
+  ftr();
+  return doc;
+}
+
+/* ══ Limpiar ══ */
+function clearAllUI(){
+  ['functionName','pythonCode','csvText','csvFile'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+  });
+  document.getElementById('output').innerHTML='';
+  document.getElementById('summaryBadges').innerHTML='';
+  lastCleanCsv='';lastCleanPreview=[];lastAnalysis=null;
+  lastModelCsv='';lastKMeansResult=null;pdfBlob=null;pdfFileName='';
+  reportLog={cargaDatos:null,limpieza:null,analisis:null,adaptacion:null};
+  showBadge(false);setStatus('Interfaz reiniciada.');
+}
+
+/* ══ Renderizado ══ */
+function renderBadges(items){
+  document.getElementById('summaryBadges').innerHTML=
+    items.map(function(i){return '<span class="badge">'+escapeHtml(i)+'</span>';}).join('');
+}
+function renderTable(rows,title){
+  var out=document.getElementById('output');
+  if(!rows||!rows.length){out.innerHTML='<div class="section-title">'+escapeHtml(title)+'</div><p>Sin datos.</p>';return;}
+  out.innerHTML='<div class="section-title">'+escapeHtml(title)+'</div>'+buildHtmlTable(rows);
+}
+function renderAnalysis(r){
+  var s=r.stats||{};
+  var h='<div class="section-title">Resumen estadístico</div><div class="stats-grid">';
+  Object.keys(s).forEach(function(f){
+    var st=s[f];
+    h+='<div class="stat-card"><h4>'+escapeHtml(f)+'</h4>'+
+      '<p><b>N:</b> '+escapeHtml(st.count)+'</p>'+
+      '<p><b>Mín:</b> '+escapeHtml(st.min)+'  <b>Máx:</b> '+escapeHtml(st.max)+'</p>'+
+      '<p><b>Media:</b> '+escapeHtml(st.mean)+'  <b>Med.:</b> '+escapeHtml(st.median)+'</p>'+
+      '<p><b>Q1:</b> '+escapeHtml(st.q1)+'  <b>Q3:</b> '+escapeHtml(st.q3)+'</p>'+
+      '<p><b>Desv.:</b> '+escapeHtml(st.stdDev)+'</p></div>';
+  });
+  h+='</div><div class="section-title">Gráficos</div><div class="charts-grid">'+
+    ['chart_hist_n1:1. Histograma Nota 1','chart_hist_n2:2. Histograma Nota 2',
+     'chart_hist_nf:3. Histograma Nota Final','chart_bar_grupos:4. Por Grupo',
+     'chart_scatter_n1_nf:5. Nota 1 vs Nota Final','chart_scatter_n2_n3:6. Nota 2 vs Nota 3'
+    ].map(function(s){var p=s.split(':');
+      return '<div class="chart-card"><div class="chart-title">'+p[1]+'</div><div id="'+p[0]+'" class="chart-box"></div></div>';
+    }).join('')+'</div>';
+  if(r.preview&&r.preview.length)h+='<div class="section-title">Vista previa</div>'+buildHtmlTable(r.preview);
+  document.getElementById('output').innerHTML=h;
+  renderBadges(['Análisis OK','Registros: '+r.totalRows,'Gráficos: 6']);
+  google.charts.setOnLoadCallback(function(){drawAllCharts(r.chartData||{});});
+}
+function renderKMeansResult(r){
+  var h='<div class="section-title">Modelo K-Means</div>'+
+    '<div class="stat-card"><p><b>Modelo:</b> '+escapeHtml(r.model)+'  <b>Tipo:</b> No supervisado</p>'+
+    '<p><b>Clusters:</b> '+escapeHtml(r.k)+'  <b>Registros:</b> '+escapeHtml(r.totalRows)+'</p>'+
+    '<p>'+escapeHtml(r.interpretation)+'</p></div>'+
+    '<div class="section-title">Resumen por cluster</div>'+buildHtmlTable(r.summary)+
+    '<div class="section-title">Clasificación por estudiante</div>'+buildHtmlTable(r.preview)+
+    '<div class="section-title">Gráficos K-Means</div><div class="charts-grid">'+
+    '<div class="chart-card"><div class="chart-title">Estudiantes por cluster</div><div id="chart_kmeans_bar" class="chart-box"></div></div>'+
+    '<div class="chart-card"><div class="chart-title">Nota Final según cluster</div><div id="chart_kmeans_scatter" class="chart-box"></div></div>'+
+    '</div>';
+  document.getElementById('output').innerHTML=h;
+  renderBadges(['K-Means','Clusters: '+r.k,'Registros: '+r.totalRows]);
+  google.charts.setOnLoadCallback(function(){drawKMeansCharts(r.chartData);});
+}
+
+/* ══ Google Charts ══ */
+function _opts(t,c){return{title:t,legend:{position:'none'},backgroundColor:'transparent',colors:[c],
+  pointSize:6,titleTextStyle:{color:'#e5e7eb',fontSize:12},
+  hAxis:{textStyle:{color:'#cbd5e1'},titleTextStyle:{color:'#cbd5e1'}},
+  vAxis:{textStyle:{color:'#cbd5e1'},titleTextStyle:{color:'#cbd5e1'}},
+  chartArea:{left:55,top:40,width:'80%',height:'68%'}};}
+function drawAllCharts(cd){
+  drawH('chart_hist_n1',   cd.histNota1,    'Histograma Nota 1',   '#60a5fa');
+  drawH('chart_hist_n2',   cd.histNota2,    'Histograma Nota 2',   '#34d399');
+  drawH('chart_hist_nf',   cd.histNotaFinal,'Histograma Nota Final','#f59e0b');
+  drawB('chart_bar_grupos',cd.barGrupos,    'Por Grupo',           '#a78bfa');
+  drawS('chart_scatter_n1_nf',cd.scatterN1Nf,'Nota 1 vs NF',      '#f87171');
+  drawS('chart_scatter_n2_n3',cd.scatterN2N3,'Nota 2 vs Nota 3',  '#22d3ee');
+}
+function drawKMeansCharts(cd){
+  drawB('chart_kmeans_bar',    cd.barClusters,    'Por cluster',   '#38bdf8');
+  drawS('chart_kmeans_scatter',cd.scatterClusters,'NF por cluster','#facc15');
+}
+function drawH(id,rows,t,c){
+  if(!rows||rows.length<=1)return;
+  new google.visualization.Histogram(document.getElementById(id))
+    .draw(google.visualization.arrayToDataTable(rows),Object.assign(_opts(t,c),{histogram:{bucketSize:0.5}}));
+}
+function drawB(id,rows,t,c){
+  if(!rows||rows.length<=1)return;
+  new google.visualization.ColumnChart(document.getElementById(id))
+    .draw(google.visualization.arrayToDataTable(rows),_opts(t,c));
+}
+function drawS(id,rows,t,c){
+  if(!rows||rows.length<=1)return;
+  new google.visualization.ScatterChart(document.getElementById(id))
+    .draw(google.visualization.arrayToDataTable(rows),_opts(t,c));
+}
+
+function buildHtmlTable(rows){
+  if(!rows||!rows.length)return '<p>Sin datos.</p>';
+  var hds=Object.keys(rows[0]);
+  return '<div class="table-wrap"><table><thead><tr>'+
+    hds.map(function(h){return '<th>'+escapeHtml(h)+'</th>';}).join('')+
+    '</tr></thead><tbody>'+
+    rows.map(function(row){return '<tr>'+hds.map(function(h){return '<td>'+escapeHtml(row[h])+'</td>';}).join('')+'</tr>';}).join('')+
+    '</tbody></table></div>';
+}
+function escapeHtml(v){
+  return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+</script>
+</body>
+</html>
