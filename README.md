@@ -1,17 +1,18 @@
 # Analytical Assistant in Google Apps Script
 
-Web application developed with Google Apps Script for CSV processing, automatic data cleaning, descriptive analytics, K-Means clustering, dynamic visualizations, and PDF report generation.
+Web application developed with Google Apps Script for CSV processing, automatic data cleaning, descriptive analytics, adaptive visualization, K-Means clustering, and PDF report generation.
 
 ---
 
 # General Overview
 
-Main application interface developed for analytical processing and visualization of CSV datasets.
-The system provides an integrated workflow for preprocessing, analytics, visualization, clustering, and export operations.
+Main application interface designed for analytical processing and visualization of structured CSV datasets.
 
 <p align="center">
- <img width="720" alt="home-principal" src="https://github.com/user-attachments/assets/a1d521be-143a-42b6-8db9-8f1354e92e69">
+  <img src="https://github.com/user-attachments/assets/a1d521be-143a-42b6-8db9-8f1354e92e69" width="720">
 </p>
+
+The application provides an integrated workflow for preprocessing, analytics, visualization, clustering, and export operations.
 
 ---
 
@@ -19,14 +20,16 @@ The system provides an integrated workflow for preprocessing, analytics, visuali
 
 - CSV file upload
 - Automatic data cleaning
+- Missing value handling
+- Duplicate detection
 - Text normalization
-- Duplicate handling
 - Descriptive analytics
+- Adaptive data visualization
 - Histogram generation
 - Scatter plot visualization
 - K-Means clustering
 - Interactive dashboard
-- PDF report export
+- PDF report generation
 - Clean CSV export
 
 ---
@@ -38,7 +41,7 @@ CSV Upload
    ↓
 Data Cleaning
    ↓
-Descriptive Analytics
+Adaptive Analytics
    ↓
 K-Means Clustering
    ↓
@@ -49,15 +52,12 @@ PDF / CSV Export
 
 ---
 
-# System Modules
+# Core Application Modules
 
 ## 1. Main Interface
 
-Main dashboard interface used to upload datasets and execute analytical operations.
+Dashboard interface used to upload datasets and execute analytical operations.
 
-<p align="center">
-<img width="653" height="1042" alt="Screenshot From 2026-05-22 12-43-19" src="https://github.com/user-attachments/assets/a1fde80c-f534-45ca-942c-a2a4f3ac2bc7" />
-</p>
 
 ### Main Functionalities
 
@@ -69,30 +69,30 @@ Main dashboard interface used to upload datasets and execute analytical operatio
 
 ---
 
-## 2. Data Cleaning Module
+## 2. Execute Data Cleaning
 
-Automatic preprocessing and data cleaning system for structured CSV datasets.
+Automatic preprocessing and cleaning system for structured CSV datasets.
+
 <p align="center">
-<img width="1182" height="1052" alt="Diseño sin título (1)" src="https://github.com/user-attachments/assets/33ffebbf-3732-4493-a154-eada2b06fdb1" />
+  <img src="https://github.com/user-attachments/assets/33ffebbf-3732-4493-a154-eada2b06fdb1" width="620">
 </p>
 
 ### Cleaning Operations
 
 - Missing value handling
-- Text normalization
 - Duplicate removal
-- Data formatting
-- Validation checks
-  
+- Text normalization
+- Data validation
+- Column formatting
 
 ---
 
-## 3. Descriptive Analytics Dashboard
+## 3. Adaptive Analytics
 
-Interactive analytical dashboard displaying descriptive statistics and graphical visualizations.
+Interactive analytics dashboard displaying descriptive statistics and dynamic visualizations generated from uploaded datasets.
 
 <p align="center">
-<img width="1182" height="1052" alt="Diseño sin título (2)" src="https://github.com/user-attachments/assets/9d704f94-9c8d-4756-bb08-6151355e5c16" />
+  <img src="https://github.com/user-attachments/assets/9d704f94-9c8d-4756-bb08-6151355e5c16" width="620">
 </p>
 
 ### Included Analytics
@@ -102,13 +102,32 @@ Interactive analytical dashboard displaying descriptive statistics and graphical
 - Standard deviation
 - Histograms
 - Scatter plots
-- Data distribution analysis
+- Distribution analysis
 
 ---
 
-# K-Means Clustering
+## 4. Adaptive Visualization
 
-The application includes a basic machine learning module implementing K-Means clustering for exploratory analytical purposes.
+Visualization module designed to display analytical transformations and processed data interpretation dynamically.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/ed213666-022d-4948-b71d-41971e023b2f" width="300">
+
+  <img src="https://github.com/user-attachments/assets/a4251c91-0ab1-4f94-928f-61d32a226480" width="300">
+</p>
+
+### Visualization Features
+
+- Dynamic visualization updates
+- Interactive data interpretation
+- Processed dataset visualization
+- Analytical transformation display
+
+---
+
+## 5. K-Means Clustering
+
+Machine learning module implementing K-Means clustering for exploratory analytical purposes.
 
 ### Clustering Features
 
@@ -117,6 +136,34 @@ The application includes a basic machine learning module implementing K-Means cl
 - Pattern exploration
 - Centroid analysis
 - Cluster visualization
+
+---
+
+## 6. Analytical Report Generation
+
+The application generates downloadable PDF reports containing processed information, visualizations, and statistical summaries.
+
+
+### Report Features
+
+- Statistical summaries
+- Structured analytical information
+- Visualization integration
+- Exportable PDF reports
+- Dynamic report generation
+
+---
+
+## 7. Clean CSV Export
+
+Allows exporting cleaned and processed datasets after preprocessing operations.
+
+
+### Export Operations
+
+- Clean dataset generation
+- Processed CSV download
+- Structured formatting
 
 ---
 
@@ -169,9 +216,13 @@ analytical-assistant-google-apps-script/
 │   └── Index.html
 │
 ├── screenshots/
-│   ├── interface.png
+│   ├── home.png
 │   ├── cleaning.png
-│   └── analytics.png
+│   ├── analytics.png
+│   ├── adaptation-1.png
+│   ├── adaptation-2.png
+│   ├── report.png
+│   └── export.png
 │
 └── sample-data/
     └── sample_dataset.csv
@@ -211,8 +262,4 @@ This project was developed for educational and analytical experimentation purpos
 ---
 
 # Author
-
-Ahren K. Churta
-
----
----
+Ahren Churta. 
